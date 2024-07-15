@@ -3,11 +3,17 @@ from pyModbusTCP.server import ModbusServer, DataBank
 import os
 import random
 import time
+from datetime import datetime
 import logging
+import redis
+import json
 
 # Server host and port prameters
 host='192.168.56.104'
 port=502
+redis_host = 'eesgi10.ee.bgu.ac.il'
+redis_port=6379
+redis_index = 'DataBank'
 
 # define log file 
 logging.basicConfig(level=logging.INFO, filename="/var/log/OT-server/water_tank.log", filemode="w", format='%(asctime)s - %(levelname)s - %(message)s')
@@ -73,6 +79,29 @@ def update_h_regs(serv_DB,water_pump_state):
         print(f"Water pump state has changed from {water_pump_state} to {current_water_pump_state}")
         logging.info(f"Info: Water pump state changed from: {water_pump_state} to {current_water_pump_state}")
 
+def post_to_redis(serv_DB):
+    current_state = serv_DB.get_input_registers(0,3)
+    water_pump_status = serv_DB.get_coils(WATER_PUMP_ADDR,1)[0]
+    thresholds = serv_DB.get_discrete_inputs(0,2)
+    high, low = thresholds
+    curr_tank,max_tank,min_tank = current_state
+    data = {'timestamp': datetime.now().isoformat(),
+            'server_data': {
+                'IP': host,
+                'Water_level': curr_tank,
+                'Water_pump_status': water_pump_status,
+                'High_threshold_sensor': high,
+                'Low_threshold_sensor': low,
+                'Water_tank_MAX': max_tank,
+                'Water_tank_MIN': min_tank
+            }
+    }
+    try:
+        r.lpush('redis_index',json.dumps(data))
+        logging.info(f"Info: posted water tank update to redis container")
+    except redis.PubSubError as e:
+        logging.info(f"Error: {e}")
+
 
 def print_tank_status(serv_DB):
     current_state = serv_DB.get_input_registers(0,3)
@@ -92,6 +121,13 @@ def print_tank_status(serv_DB):
 
 # Modbus Server object 
 serv_DB, server = server_init(host,port)
+try:
+    r = redis.Redis(host=redis_host,port=redis_port,decode_responses=True) # connect to redis remote container
+    logging.info(f"Info: Connection to redis container {redis_host}:{redis_port} established")
+except redis.ConnectionError as e:
+    logging.error(f"Error: failed to connect to Redis container {redis_host}:{redis_port}, fail: {e}")
+    exit(1)
+
 server.start()
 water_pump_state = False
 print("server start")
@@ -101,6 +137,7 @@ try:
         update_water_tank(serv_DB)
         run_server(serv_DB)
         update_h_regs(serv_DB,water_pump_state)
+        post_to_redis(serv_DB)
         print_tank_status(serv_DB)
         water_pump_state = serv_DB.get_coils(WATER_PUMP_ADDR,1)[0]
         time.sleep(1)
