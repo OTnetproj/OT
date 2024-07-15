@@ -1,0 +1,13 @@
+# ignore .pcap files 
+*.pcap
+
+#ignore http_certificate
+http_ca.crt
+
+# ignore txt and log files
+*.log
+*.txt
+
+# ignore servers details file
+*.ModbusServers.txt
+
