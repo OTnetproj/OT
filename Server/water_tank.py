@@ -1,6 +1,4 @@
-import pyModbusTCP
 from pyModbusTCP.server import ModbusServer, DataBank
-import os
 import random
 import time
 from datetime import datetime
