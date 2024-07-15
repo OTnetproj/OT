@@ -97,7 +97,7 @@ def post_to_redis(serv_DB):
             }
     }
     try:
-        r.lpush('redis_index',json.dumps(data))
+        r.lpush(redis_index,json.dumps(data))
         logging.info(f"Info: posted water tank update to redis container")
     except redis.PubSubError as e:
         logging.info(f"Error: {e}")
