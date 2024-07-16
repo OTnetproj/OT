@@ -24,7 +24,7 @@ requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 # define remote redis cluster / container
 redis_host = 'eesgi10.ee.bgu.ac.il'
 redis_port=6379
-redis_index= ['modbusclientsreports', 'databank','packetscapture/str','packetscapture/raw'] # list of the indexes stored on redis - must be lowercases only!
+redis_index= ['modbusclientsreports', 'databank','packetscapture'] # list of the indexes stored on redis - must be lowercases only!
 
 # define elasticsearch remote container
 es_host = 'https://eesgi10.ee.bgu.ac.il:9200'
@@ -48,7 +48,7 @@ def fetch_logs(index):
     index_process = index+'process'
     while True:
         # each doc transfered to new index for processing and pop out of index's list
-        doc = r.brpoplpush(index,index_process, timeout=0.4)
+        doc = r.brpoplpush(index,index_process, timeout=0.5)
         if not doc:
             break
         docs.append(doc)
@@ -67,7 +67,7 @@ def post_to_es(docs,index):
     ]
     try:
         helpers.bulk(es, actions) # use bulk API to post data to elasticsearch DB
-        print(f"Posted {len(docs)} to Elasticsearch")
+        print(f"Posted {len(docs)} to index: {index} in Elasticsearch")
         logging.info(f"Info: Posted {len(docs)} new docs to {index} :Elasticsearch")
         # remove docs from processing index
         for doc in docs:
@@ -86,7 +86,7 @@ def main():
                 logging.info(f"Info: no new docs for index: {index}")
             else:
                 post_to_es(docs, index)
-            time.sleep(10)
+            time.sleep(5)
 
 
 

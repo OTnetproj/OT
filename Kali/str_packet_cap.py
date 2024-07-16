@@ -1,13 +1,9 @@
 import os
 import pyshark
 import yara
-from datetime import datetime
 import json
 import argparse
 import redis
-import requests
-from requests.auth import HTTPBasicAuth
-from urllib3.exceptions import InsecureRequestWarning
 import logging
 
 
@@ -18,17 +14,13 @@ rules = yara.compile(filepaths={
     'namespace2': rule2_path
     })
 
-elk_pass = os.getenv('ELASTIC_PASSWORD')
-url = "https://132.72.49.244:9200/packets_report/_doc?pipeline=add_date"
-requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
-
 # define log file
 logging.basicConfig(level=logging.INFO, filename="/var/log/OT/str_packet_captrue.log", filemode="w", format='%(asctime)s - %(levelname)s - %(message)s')
 
 # define remote redis cluster / container
 redis_host = 'eesgi10.ee.bgu.ac.il'
 redis_port=6379
-redis_index='packetscapture/str'
+redis_index='packetscapture'
 try:
     r = redis.Redis(host=redis_host,port=redis_port,decode_responses=True)
     logging.info(f"Info: Connection to redis container {redis_host}:{redis_port} has established")
