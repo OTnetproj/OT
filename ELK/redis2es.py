@@ -54,7 +54,7 @@ def post_to_es(docs,index):
     actions = [
         {
             "_index": index,
-            "_source": json.loads(doc)
+            "doc": json.loads(doc)
         }
         for doc in docs
     ]
