@@ -35,31 +35,51 @@ except redis.ConnectionError as e:
     logging.error(f"Error: Redis connection has failed: {e}")
     exit(1)
 
-def main():
+def fetch_logs(index):
+    # fetch logs from redis-index to new index for processing, and append docs to local list
+    docs = []
+    index_process = index+'process'
     while True:
-        try:
-            for index in redis_index:
-                json_items = r.lrange(index,0,-1)
-                if not json_items:
-                    print(f"{index} in redis is empty")
-                    logging.info(f"Info: {index} has no new docs in redis")
-                else:
-                    data = [json.loads(item) for item in json_items]
-                    actions = [
-                        {
-                            "_index": index,
-                            "_source": d
-                        }
-                        for d in data
-                    ]
-                    helpers.bulk(es, actions)
-                    r.delete(index)
-                    print(f"Send bulk of index: {index} to ES node")
-                    logging.info(f"Info: sent bulk of index {index} to ES node")
-            time.sleep(10)
-        except KeyboardInterrupt as e:
-            logging.error(f"Error: {e}")
+        # each doc transfered to new index for processing and pop out of index's list
+        doc = r.brpoplpush(index,index_process, timeout=1)
+        if not doc:
             break
+        docs.append(doc)
+    return docs
+
+
+def post_to_es(docs,index):
+    # load each doc to actions
+    actions = [
+        {
+            "index_": index,
+            "_source": json.loads(doc)
+        }
+        for doc in docs
+    ]
+    try:
+        helpers.bulk(es, actions) # use bulk API to post data to elasticsearch DB
+        print(f"Posted {len(docs)} to Elasticsearch")
+        logging.info(f"Info: Posted {len(docs)} new docs to Elasticsearch")
+        # remove docs from processing index
+        for doc in docs:
+            r.lrem(index,index+'process',1,doc)
+    except Exception as e:
+        print(f"Error: posting logs failed: {e}")
+        logging.error(f"Error: posting docs failed: {e}")
+
+
+def main():
+    while r.ping():
+        for index in redis_index:
+            docs = fetch_logs(index)
+            if not docs:
+                print(f"no new docs for index: {index}")
+                logging.info(f"Info: no new docs for index: {index}")
+                continue
+            post_to_es(docs, index)
+            time.sleep(10)
+
 
 
 if __name__ == "__main__":
