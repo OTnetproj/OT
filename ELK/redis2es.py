@@ -68,7 +68,7 @@ def post_to_es(docs,index):
     try:
         helpers.bulk(es, actions) # use bulk API to post data to elasticsearch DB
         print(f"Posted {len(docs)} to Elasticsearch")
-        logging.info(f"Info: Posted {len(docs)} new docs to Elasticsearch")
+        logging.info(f"Info: Posted {len(docs)} new docs to {index} :Elasticsearch")
         # remove docs from processing index
         for doc in docs:
             r.lrem(index+'process',1,doc)
