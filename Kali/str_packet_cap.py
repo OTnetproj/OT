@@ -64,7 +64,6 @@ def packet_report(packet,match):
         "dst_port": f'{packet.tcp.dstport}',
         "matching_rule": f'{match}'
      }
-    print(packet_info)
     post_to_redis(packet_info)
 
 def post_to_redis(payload):
