@@ -15,7 +15,7 @@ rules = yara.compile(filepaths={
     })
 
 # define log file
-logging.basicConfig(level=logging.INFO, filename="/var/log/OT/str_packet_captrue.log", filemode="w", format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, filename="/var/log/OT/str_packet_capture.log", filemode="w", format='%(asctime)s - %(levelname)s - %(message)s')
 
 # define remote redis cluster / container
 redis_host = 'eesgi10.ee.bgu.ac.il'
