@@ -11,7 +11,7 @@ host='192.168.56.104'
 port=502
 redis_host = 'eesgi10.ee.bgu.ac.il'
 redis_port=6379
-redis_index = 'DataBank'
+redis_index = 'databank'
 
 # define log file 
 logging.basicConfig(level=logging.INFO, filename="/var/log/OT-server/water_tank.log", filemode="w", format='%(asctime)s - %(levelname)s - %(message)s')

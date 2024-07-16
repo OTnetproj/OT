@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO, filename="/var/log/OT/ModbusClient.log",
 # define remote redis cluster / container
 redis_host = 'eesgi10.ee.bgu.ac.il'
 redis_port=6379
-redis_index='ModbusClientsReports'
+redis_index='modbusclientsreports'
 try:
     r = redis.Redis(host=redis_host,port=redis_port,decode_responses=True)
     logging.info(f"Info: Connection to redis container {redis_host}:{redis_port} has established")
