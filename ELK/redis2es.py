@@ -41,7 +41,7 @@ def fetch_logs(index):
     index_process = index+'process'
     while True:
         # each doc transfered to new index for processing and pop out of index's list
-        doc = r.brpoplpush(index,index_process, timeout=1)
+        doc = r.brpoplpush(index,index_process, timeout=0.4)
         if not doc:
             break
         docs.append(doc)
@@ -70,7 +70,7 @@ def post_to_es(docs,index):
 
 
 def main():
-    while r.ping():
+    while True:
         for index in redis_index:
             docs = fetch_logs(index)
             if not docs:
