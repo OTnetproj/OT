@@ -5,6 +5,8 @@ import os
 import logging
 import redis
 from elasticsearch import Elasticsearch, helpers
+import requests
+from urllib3.exceptions import InsecureRequestWarning
 
 # init clients from outside list and remote registers define
 file_path='ModbusServers.txt'
@@ -15,6 +17,9 @@ WATER_PUMP_ADDR = 0         # Coils address for water tank's pump status
 
 # define log file
 logging.basicConfig(level=logging.INFO, filename="/var/log/OT/redis2es.log", filemode="w", format='%(asctime)s - %(levelname)s - %(message)s')
+
+# ignore Insecure warnings
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 # define remote redis cluster / container
 redis_host = 'eesgi10.ee.bgu.ac.il'
