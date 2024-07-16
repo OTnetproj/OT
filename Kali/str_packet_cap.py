@@ -4,14 +4,15 @@ import yara
 from datetime import datetime
 import json
 import argparse
+import redis
 import requests
 from requests.auth import HTTPBasicAuth
 from urllib3.exceptions import InsecureRequestWarning
 import logging
 
 
-rule1_path='/home/kali/Desktop/OT-kali/YARA/rules/read_coils.yar'
-rule2_path='/home/kali/Desktop/OT-kali/YARA/rules/write_single_coil.yar'
+rule1_path='/home/kali/Desktop/OT/Kali/YARA/rules/read_coils.yar'
+rule2_path='/home/kali/Desktop/OT/Kali/YARA/rules/write_single_coil.yar'
 rules = yara.compile(filepaths={
     'namespace1': rule1_path,
     'namespace2': rule2_path
@@ -20,7 +21,21 @@ rules = yara.compile(filepaths={
 elk_pass = os.getenv('ELASTIC_PASSWORD')
 url = "https://132.72.49.244:9200/packets_report/_doc?pipeline=add_date"
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
-logging.basicConfig(level=logging.INFO, filename="/var/log/OT/packet_cap.log", filemode="w", format='%(asctime)s - %(levelname)s - %(message)s')
+
+# define log file
+logging.basicConfig(level=logging.INFO, filename="/var/log/OT/str_packet_captrue.log", filemode="w", format='%(asctime)s - %(levelname)s - %(message)s')
+
+# define remote redis cluster / container
+redis_host = 'eesgi10.ee.bgu.ac.il'
+redis_port=6379
+redis_index='packetscapture/str'
+try:
+    r = redis.Redis(host=redis_host,port=redis_port,decode_responses=True)
+    logging.info(f"Info: Connection to redis container {redis_host}:{redis_port} has established")
+except redis.ConnectionError as e:
+    logging.error(f"Error: Redis connection has failed: {e}")
+    exit(1)
+
 
 def capture_packets(interface, bpf_filter,port):
     capture = pyshark.LiveCapture(interface=interface,bpf_filter=bpf_filter, decode_as={f'tcp.port=={port}': 'mbtcp'})
@@ -58,21 +73,14 @@ def packet_report(packet,match):
         "matching_rule": f'{match}'
      }
     print(packet_info)
-    post_to_elastic(packet_info)
+    post_to_redis(packet_info)
 
-
-def post_to_elastic(payload):
-	response = requests.post(
-		url,
-		auth=HTTPBasicAuth('elastic', elk_pass),
-		headers={'Content-Type': 'application/json'},
-		json=payload,
-		verify=False
-	)
-	if response.status_code not in [200,201]:
-		logging.error(f"Error: Received status code {response.status_code}")
-	else:
-		logging.info(f"Info: Received status code {response.status_code}")
+def post_to_redis(payload):
+     try:
+        r.lpush(redis_index,json.dumps(payload))
+        logging.info(f"Info: Post to: {redis_index} in redis complete")
+     except Exception as e:
+          logging.error(f"Error: {e}")
 
 
 def main():
