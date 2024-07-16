@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO, filename="/var/log/OT/redis2es.log", fil
 # define remote redis cluster / container
 redis_host = 'eesgi10.ee.bgu.ac.il'
 redis_port=6379
-redis_index= ['ModbusClientsReports', 'DataBank'] # list of the indexes stored on redis
+redis_index= ['modbusclientsreports', 'databank'] # list of the indexes stored on redis - must be lowercases only!
 
 # define elasticsearch remote container
 es_host = 'https://eesgi10.ee.bgu.ac.il:9200'
@@ -45,7 +45,6 @@ def main():
                 actions = [
                     {
                         "_index": index,
-                        "_type": "_doc",
                         "_source": d
                     }
                     for d in data
