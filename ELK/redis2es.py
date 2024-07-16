@@ -25,6 +25,7 @@ redis_index= ['modbusclientsreports', 'databank'] # list of the indexes stored o
 es_host = 'https://eesgi10.ee.bgu.ac.il:9200'
 es_username = 'elastic'
 es_pass = os.getenv('ELASTIC_PASSWORD')
+es_pipeline = 'add_date'
 
 # Establish connections with redis and elasticsearch containerized services
 try:
@@ -54,7 +55,8 @@ def post_to_es(docs,index):
     actions = [
         {
             "_index": index,
-            "doc": json.loads(doc)
+            "_source": json.loads(doc),
+            "pipeline": es_pipeline
         }
         for doc in docs
     ]
