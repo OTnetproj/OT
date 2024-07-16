@@ -83,16 +83,15 @@ def post_to_redis(serv_DB):
     thresholds = serv_DB.get_discrete_inputs(0,2)
     high, low = thresholds
     curr_tank,max_tank,min_tank = current_state
-    data = {'timestamp': datetime.now().isoformat(),
-            'server_data': {
-                'IP': host,
-                'Water_level': curr_tank,
-                'Water_pump_status': water_pump_status,
-                'High_threshold_sensor': high,
-                'Low_threshold_sensor': low,
-                'Water_tank_MAX': max_tank,
-                'Water_tank_MIN': min_tank
-            }
+    data = {    
+        'timestamp': datetime.now().isoformat(),
+        'Server_IP': host,
+        'Water_level': curr_tank,
+        'High_threshold_sensor': high,
+        'Low_threshold_sensor': low,
+        'Water_pump_status': water_pump_status,
+        'Water_tank_MAX': max_tank,
+        'Water_tank_MIN': min_tank
     }
     try:
         r.lpush(redis_index,json.dumps(data))

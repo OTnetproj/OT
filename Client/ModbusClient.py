@@ -51,15 +51,13 @@ class Session(threading.Thread):
         # post to redis whenever a water pump status changes
         data = {
             'timestamp': datetime.now().isoformat(),
-            'server_data': {
-                'Server_IP': self.server_ip,
-                'Server_port': self.server_port,
-                'Unit_id': self.unit_id,
-                'Water_level': water_level,
-                'High_threshold_sensor': high_mark_state,
-                'Low_threshold_sensor': low_mark_state,
-                'Water_pump_status': pump_state
-            }
+            'Server_IP': self.server_ip,
+            'Server_port': self.server_port,
+            'Unit_id': self.unit_id,
+            'Water_level': water_level,
+            'High_threshold_sensor': high_mark_state,
+            'Low_threshold_sensor': low_mark_state,
+            'Water_pump_status': pump_state
         }
         try:
             r.lpush(redis_index,json.dumps(data))
