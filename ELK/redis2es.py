@@ -63,7 +63,7 @@ def post_to_es(docs,index):
         logging.info(f"Info: Posted {len(docs)} new docs to Elasticsearch")
         # remove docs from processing index
         for doc in docs:
-            r.lrem(index,index+'process',1,doc)
+            r.lrem(index+'process',1,doc)
     except Exception as e:
         print(f"Error: posting logs failed: {e}")
         logging.error(f"Error: posting docs failed: {e}")
