@@ -40,16 +40,23 @@ def main():
         try:
             for index in redis_index:
                 json_items = r.lrange(index,0,-1)
-                r.delete(index)
-                data = [json.loads(item) for item in json_items]
-                actions = [
-                    {
-                        "_index": index,
-                        "_source": d
-                    }
-                    for d in data
-                ]
-                helpers.bulk(es, actions)
+                if not json_items:
+                    print(f"{index} in redis is empty")
+                    logging.info(f"Info: {index} has no new docs in redis")
+                else:
+                    r.delete(index)
+                    data = [json.loads(item) for item in json_items]
+                    actions = [
+                        {
+                            "_index": index,
+                            "_source": d
+                        }
+                        for d in data
+                    ]
+                    helpers.bulk(es, actions)
+                    print(f"Send bulk of index: {index} to ES node")
+                    logging.info(f"Info: sent bulk of index {index} to ES node")
+            time.sleep(10)
         except KeyboardInterrupt as e:
             logging.error(f"Error: {e}")
             break
