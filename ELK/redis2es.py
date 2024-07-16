@@ -44,7 +44,6 @@ def main():
                     print(f"{index} in redis is empty")
                     logging.info(f"Info: {index} has no new docs in redis")
                 else:
-                    r.delete(index)
                     data = [json.loads(item) for item in json_items]
                     actions = [
                         {
@@ -54,6 +53,7 @@ def main():
                         for d in data
                     ]
                     helpers.bulk(es, actions)
+                    r.delete(index)
                     print(f"Send bulk of index: {index} to ES node")
                     logging.info(f"Info: sent bulk of index {index} to ES node")
             time.sleep(10)
