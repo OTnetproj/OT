@@ -31,6 +31,7 @@ try:
     r = redis.Redis(host=redis_host,port=redis_port,decode_responses=True)
     es = Elasticsearch([es_host], basic_auth=(es_username,es_pass), verify_certs=False)
     logging.info(f"Info: Connection to redis container {redis_host}:{redis_port} has established")
+    logging.info(f"Info: Connection to Elasticsearch container {es.info()} has established")
 except redis.ConnectionError as e:
     logging.error(f"Error: Redis connection has failed: {e}")
     exit(1)
@@ -52,7 +53,7 @@ def post_to_es(docs,index):
     # load each doc to actions
     actions = [
         {
-            "index_": index,
+            "_index": index,
             "_source": json.loads(doc)
         }
         for doc in docs
@@ -76,8 +77,8 @@ def main():
             if not docs:
                 print(f"no new docs for index: {index}")
                 logging.info(f"Info: no new docs for index: {index}")
-                continue
-            post_to_es(docs, index)
+            else:
+                post_to_es(docs, index)
             time.sleep(10)
 
 
