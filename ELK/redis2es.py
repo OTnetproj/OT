@@ -45,6 +45,7 @@ def main():
                 actions = [
                     {
                         "_index": index,
+                        "_type": doc,
                         "_source": d
                     }
                     for d in data
