@@ -116,7 +116,7 @@ def print_tank_status(serv_DB):
         f"Water tank MAX: {max_tank}"
         f"Water tank MIN: {min_tank}"
     )
-    print(status_message,end='')
+    print('{}'.format(status_message), end='\r')
 
 # Modbus Server object 
 serv_DB, server = server_init(host,port)
