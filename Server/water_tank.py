@@ -102,6 +102,8 @@ def post_to_redis(serv_DB):
 
 
 def print_tank_status(serv_DB):
+    for r in range(7):
+        sys.stdout.write(' ' *60 + '\n')
     current_state = serv_DB.get_input_registers(0,3)
     water_pump_status = serv_DB.get_coils(WATER_PUMP_ADDR,1)[0]
     thresholds = serv_DB.get_discrete_inputs(0,2)
@@ -116,8 +118,10 @@ def print_tank_status(serv_DB):
         f"Water tank MAX: {max_tank}\n"
         f"Water tank MIN: {min_tank}\n"
     )
-    print(status_message)
-    print('\033[1A',end='\x1b[2k')
+    sys.stdout.write("\33[7A")
+    sys.stdout.write("\r")
+    sys.stdout.flush()
+    print(status_message,end="\r")
 
 # Modbus Server object 
 serv_DB, server = server_init(host,port)
