@@ -5,6 +5,7 @@ from datetime import datetime
 import logging
 import redis
 import json
+import sys
 
 # Server host and port prameters
 host='192.168.56.104'
@@ -106,15 +107,18 @@ def print_tank_status(serv_DB):
     thresholds = serv_DB.get_discrete_inputs(0,2)
     high, low = thresholds
     curr_tank,max_tank,min_tank = current_state
-    print("Water Tank Stats:")
-    print(f"    Water tank current level: {curr_tank} cm")
-    print(f"    Water pump status is : {water_pump_status}")
-    print(f"    Water level exceeded High Threshold: {high}")
-    print(f"    Water level exceeded Low Threshold: {low}")
-    print(f"    Water tank MAX: {max_tank}")
-    print(f"    Water tank MIN: {min_tank}")
-
-
+    status_message = (
+        f"Water Tank Status:"
+        f"Water tank current level: {curr_tank} cm"
+        f"Water pump status is : {water_pump_status}"
+        f"Water level exceeded High Threshold: {high}"
+        f"Water level exceeded Low Threshold: {low}"
+        f"Water tank MAX: {max_tank}"
+        f"Water tank MIN: {min_tank}"
+    )
+    sys.stdout.write("\033[F" * status_message.count('\n'))
+    sys.stdout.write(status_message)
+    sys.stdout.flush()
 
 # Modbus Server object 
 serv_DB, server = server_init(host,port)
