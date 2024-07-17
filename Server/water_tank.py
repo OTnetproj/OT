@@ -135,7 +135,7 @@ water_pump_state = False
 print(f"server start\n"
       f"Server's IP: {host}\n"
       f"Server's Port: {port}\n")
-print("\n" *3 )
+print("\n" *7)
 
 try:
     while True:
