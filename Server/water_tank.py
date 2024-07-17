@@ -108,13 +108,13 @@ def print_tank_status(serv_DB):
     high, low = thresholds
     curr_tank,max_tank,min_tank = current_state
     status_message = (
-        "Water Tank Status:\n"
-        "Water tank current level: {curr_tank} cm\n"
-        "Water pump status is : {water_pump_status}\n"
-        "Water level exceeded High Threshold: {high}\n"
-        "Water level exceeded Low Threshold: {low}\n"
-        "Water tank MAX: {max_tank}\n"
-        "Water tank MIN: {min_tank}\n"
+        f"Water Tank Status:\n"
+        f"Water tank current level: {curr_tank} cm\n"
+        f"Water pump status is : {water_pump_status}\n"
+        f"Water level exceeded High Threshold: {high}\n"
+        f"Water level exceeded Low Threshold: {low}\n"
+        f"Water tank MAX: {max_tank}\n"
+        f"Water tank MIN: {min_tank}\n"
     )
     print('{}'.format(status_message), end='\r')
 
