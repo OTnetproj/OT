@@ -108,15 +108,15 @@ def print_tank_status(serv_DB):
     high, low = thresholds
     curr_tank,max_tank,min_tank = current_state
     status_message = (
-        f"Water Tank Status:"
-        f"Water tank current level: {curr_tank} cm"
-        f"Water pump status is : {water_pump_status}"
-        f"Water level exceeded High Threshold: {high}"
-        f"Water level exceeded Low Threshold: {low}"
-        f"Water tank MAX: {max_tank}"
-        f"Water tank MIN: {min_tank}"
+        "Water Tank Status:\n"
+        "Water tank current level: {curr_tank} cm\n"
+        "Water pump status is : {water_pump_status}\n"
+        "Water level exceeded High Threshold: {high}\n"
+        "Water level exceeded Low Threshold: {low}\n"
+        "Water tank MAX: {max_tank}\n"
+        "Water tank MIN: {min_tank}\n"
     )
-    print(status_message)
+    print('{}'.format(status_message), end='\r')
 
 # Modbus Server object 
 serv_DB, server = server_init(host,port)
