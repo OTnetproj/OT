@@ -102,11 +102,6 @@ def post_to_redis(serv_DB):
 
 
 def print_tank_status(serv_DB):
-    for i in range(7):
-        print(' '*60 + '\n')
-        sys.stdout.write("\33[6A")
-        sys.stdout.write("\r")
-        sys.stdout.flush()
     current_state = serv_DB.get_input_registers(0,3)
     water_pump_status = serv_DB.get_coils(WATER_PUMP_ADDR,1)[0]
     thresholds = serv_DB.get_discrete_inputs(0,2)
