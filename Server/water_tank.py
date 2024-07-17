@@ -137,7 +137,10 @@ except redis.ConnectionError as e:
 
 server.start()
 water_pump_state = False
-print("server start")
+print(f"server start\n"
+      f"Server's IP: {host}\n"
+      f"Server's Port: {port}\n")
+print("\n" * 7)
 
 try:
     while True:
