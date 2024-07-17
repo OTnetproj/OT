@@ -1,19 +1,24 @@
-import os
 import psutil
 import json
 import time
 import datetime
 import requests
 import logging
-from requests.auth import HTTPBasicAuth
-from urllib3.exceptions import InsecureRequestWarning
-
-elk_pass = os.getenv('ELASTIC_PASSWORD')
-url = "https://eesgi10.ee.bgu.ac.il:9200/servers/_doc?pipeline=add_date"
-requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+import redis
 
 # define info and error logs for post requests
 logging.basicConfig(level=logging.INFO, filename="/var/log/OT/servers_handler.log", filemode="w", format='%(asctime)s - %(levelname)s - %(message)s')
+
+# define remote redis cluster / container
+redis_host = 'eesgi10.ee.bgu.ac.il'
+redis_port=6379
+redis_index='servershandler'
+try:
+    r = redis.Redis(host=redis_host,port=redis_port,decode_responses=True)
+    logging.info(f"Info: Connection to redis container {redis_host}:{redis_port} has established")
+except redis.ConnectionError as e:
+    logging.error(f"Error: Redis connection has failed: {e}")
+    exit(1)
 
 def monitor(prev):
 	current = set()
@@ -34,7 +39,7 @@ def monitor(prev):
 		new_servers_add(new_servers)
 	if(len(to_remove_servers)):
 		old_servers_removal(to_remove_servers)
-	post_to_elastic(current_servers_json)
+	post_to_redis(current_servers_json)
 	return list(current)
 
 def new_servers_add(new):
@@ -45,8 +50,8 @@ def new_servers_add(new):
 		"servers_details_diff": new_details,
 		"timestamp": datetime.datetime.now().isoformat()
 	}
-	print(new_servers_json) # debug
-	post_to_elastic(new_servers_json)
+	logging.info(f"Info: New servers:{new_details} are connected")
+	post_to_redis(new_servers_json)
 
 
 def old_servers_removal(old):
@@ -57,21 +62,15 @@ def old_servers_removal(old):
 		"servers_details_diff": old_details,
 		"timestamp": datetime.datetime.now().isoformat()
 	}
-	post_to_elastic(old_servers_json)
+	logging.info(f"Info: Servers:{old_details} have disconnected")
+	post_to_redis(old_servers_json)
 
-def post_to_elastic(payload):
-	response = requests.post(
-		url,
-		auth=HTTPBasicAuth('elastic', elk_pass),
-		headers={'Content-Type': 'application/json'},
-		json=payload,
-		verify=False
-	)
-	if response.status_code not in [200,201]:
-		logging.error(f"Error: Received status code {response.status_code}")
-	else:
-		logging.info(f"Info: Received status code {response.status_code}")
-	print(f"response status is: {response.status_code}")
+def post_to_redis(payload):
+	try:
+		r.lpush(redis_index,json.dumps(payload))
+		logging.info(f"INFO: Posted to redis: {redis_host}:{redis_port} to index:{redis_index} is complete")
+	except Exception as e:
+		logging.error(f"Error: Post to redis: {redis_host}:{redis_port} to index: {redis_index} failed")
 
 
 def main():
