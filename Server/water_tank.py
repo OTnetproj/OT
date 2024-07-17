@@ -135,7 +135,7 @@ water_pump_state = False
 print(f"server start\n"
       f"Server's IP: {host}\n"
       f"Server's Port: {port}\n")
-
+print_tank_status(serv_DB)
 try:
     while True:
         update_water_tank(serv_DB)
