@@ -116,9 +116,7 @@ def print_tank_status(serv_DB):
         f"Water tank MAX: {max_tank}"
         f"Water tank MIN: {min_tank}"
     )
-    sys.stdout.write("\033[F" * status_message.count('\n'))
-    sys.stdout.write(status_message)
-    sys.stdout.flush()
+    print(status_message,end='')
 
 # Modbus Server object 
 serv_DB, server = server_init(host,port)
