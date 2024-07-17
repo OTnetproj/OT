@@ -117,7 +117,7 @@ def print_tank_status(serv_DB):
         f"Water tank MIN: {min_tank}\n"
     )
     sys.stdout.write("\033[F")
-    sys.stdout.write("\033[K")
+    sys.stdout.write("\033[J")
     print(status_message)
 
 
@@ -135,7 +135,8 @@ water_pump_state = False
 print(f"server start\n"
       f"Server's IP: {host}\n"
       f"Server's Port: {port}\n")
-print_tank_status(serv_DB)
+print("\n" *8 )
+
 try:
     while True:
         update_water_tank(serv_DB)
