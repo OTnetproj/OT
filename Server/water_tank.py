@@ -104,7 +104,7 @@ def post_to_redis(serv_DB):
 def print_tank_status(serv_DB):
     for i in range(7):
         print(' '*60 + '\n')
-        sys.stdout.write("\33[7A")
+        sys.stdout.write("\33[6A")
         sys.stdout.write("\r")
         sys.stdout.flush()
     current_state = serv_DB.get_input_registers(0,3)
@@ -122,9 +122,6 @@ def print_tank_status(serv_DB):
         f"Water tank MIN: {min_tank}\n"
     )
     print(status_message,end="\r")
-    sys.stdout.write("\33[7A")
-    sys.stdout.write("\r")
-    sys.stdout.flush()
 
 # Modbus Server object 
 serv_DB, server = server_init(host,port)
@@ -140,7 +137,6 @@ water_pump_state = False
 print(f"server start\n"
       f"Server's IP: {host}\n"
       f"Server's Port: {port}\n")
-print("\n" * 7)
 
 try:
     while True:
