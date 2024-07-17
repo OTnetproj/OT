@@ -108,15 +108,16 @@ def print_tank_status(serv_DB):
     high, low = thresholds
     curr_tank,max_tank,min_tank = current_state
     status_message = (
-        f"Water Tank Status:\n"
-        f"Water tank current level: {curr_tank} cm\n"
-        f"Water pump status is : {water_pump_status}\n"
-        f"Water level exceeded High Threshold: {high}\n"
-        f"Water level exceeded Low Threshold: {low}\n"
-        f"Water tank MAX: {max_tank}\n"
-        f"Water tank MIN: {min_tank}\n"
+        f"| Water Tank Status:                          |\n"
+        f"| Water tank current level: {curr_tank} cm    |\n"
+        f"| Water pump status is : {water_pump_status}  |\n"
+        f"| Water level exceeded High Threshold: {high} |\n"
+        f"| Water level exceeded Low Threshold: {low}   |\n"
+        f"| Water tank MAX: {max_tank}                  |\n"
+        f"| Water tank MIN: {min_tank}                  |\n"
+        f"===============================================\n"
     )
-    sys.stdout.write("\033[8F")
+    sys.stdout.write("\033[9F")
     sys.stdout.write("\033[J")
     print(status_message)
 
@@ -135,6 +136,7 @@ water_pump_state = False
 print(f"server start\n"
       f"Server's IP: {host}\n"
       f"Server's Port: {port}\n")
+print("===============================================\n")
 print("\n" *7)
 
 try:
