@@ -59,7 +59,7 @@ def run_server(serv_DB):
             serv_DB.set_discrete_inputs(HIGH_MARK_ADDR,[True,True])
         # If current level is out of range, inform
         case _:
-            print(f"current water level is Out of Range: {current_water_level}")
+            # print(f"current water level is Out of Range: {current_water_level}") # debug
             logging.error(f"Error: current water level is Out of Range {current_water_level}")
 
 def update_h_regs(serv_DB,water_pump_state):
@@ -75,7 +75,7 @@ def update_h_regs(serv_DB,water_pump_state):
         case _:
             pass # both holding registers remian the same
     if current_water_pump_state != water_pump_state:
-        print(f"Water pump state has changed from {water_pump_state} to {current_water_pump_state}")
+        # print(f"Water pump state has changed from {water_pump_state} to {current_water_pump_state}") # debug
         logging.info(f"Info: Water pump state changed from: {water_pump_state} to {current_water_pump_state}")
 
 def post_to_redis(serv_DB):
