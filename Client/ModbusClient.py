@@ -74,7 +74,7 @@ class Session(threading.Thread):
                 if self.client.is_open:
                     # Read Water level
                     water_level = self.client.read_input_registers(WATER_LEVEL_ADDR,1)[0]
-                    if water_level:
+                    if water_level>=0:
                         print(f"IP: {self.server_ip}, ID: {self.unit_id} Current water level is: {water_level}")
                         high_mark_state = self.client.read_discrete_inputs(HIGH_MARK_ADDR,1)[0]
                         low_mark_state = self.client.read_discrete_inputs(LOW_MARK_ADDR,1)[0]
