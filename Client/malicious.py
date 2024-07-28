@@ -34,7 +34,7 @@ class Session(threading.Thread):
         while True:
             try:
                 if self.client.is_open: # check if server is running
-                    time_to_att = random.choice([1,60])
+                    time_to_att = random.randrange(1,60)
                     print(f"Malicious Client attack on {self.server_ip}:{self.server_port} launches in {time_to_att} seconds")
                     logging.info(f"Malicious Client attack on {self.server_ip}:{self.server_port} launches in {time_to_att} seconds")
                     time.sleep(time_to_att)
