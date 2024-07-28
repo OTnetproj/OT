@@ -44,7 +44,7 @@ def packet_callback(packet):
             packet_bytes = packet.get_raw_packet()
             match = rules.match(data=packet_bytes)
             if match:
-                print(match)
+                # print(match)
                 packet_report(packet,match)
         else:
             print("Packet isn't Modbus type")
