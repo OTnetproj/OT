@@ -42,7 +42,7 @@ class Session(threading.Thread):
                     if self.client.write_single_coil(WATER_PUMP_ADDR,water_pump_current ^ 1) is not True:
                         logging.warn(f"couldn't write a single coil to {self.server_ip}:{self.server_port}")
                     else:
-                        print(f"{datetime.now().isoformat} : write value {water_pump_current^1} to {self.server_ip} water pump")
+                        print(f"{datetime.now().isoformat()} : write value {water_pump_current^1} to {self.server_ip} water pump")
                         logging.info(f"write value {water_pump_current^1} to {self.server_ip} water pump")
 
                 else:
