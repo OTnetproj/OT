@@ -7,7 +7,7 @@ from pyModbusTCP.client import ModbusClient
 
 WATER_PUMP_ADDR = 0
 file_path = 'ModbusServers.txt'
-random.seed(5)
+random.seed(2)
 logging.basicConfig(level=logging.INFO, filename="/var/log/OT/MaliciousClient.log", filemode="w", format='%(asctime)s - %(levelname)s - %(message)s')
 
 class Session(threading.Thread):
