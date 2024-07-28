@@ -7,7 +7,7 @@ from pyModbusTCP.client import ModbusClient
 
 WATER_PUMP_ADDR = 0
 file_path = 'ModbusServers.txt'
-random.seed(2)
+random.seed(int(datetime.now().timestamp()))
 logging.basicConfig(level=logging.INFO, filename="/var/log/OT/MaliciousClient.log", filemode="w", format='%(asctime)s - %(levelname)s - %(message)s')
 
 class Session(threading.Thread):
@@ -34,7 +34,7 @@ class Session(threading.Thread):
         while True:
             try:
                 if self.client.is_open: # check if server is running
-                    time_to_att = random.randrange(1,10)
+                    time_to_att = random.randrange(1,60)
                     print(f"Malicious Client attack on {self.server_ip}:{self.server_port} launches in {time_to_att} seconds")
                     logging.info(f"Malicious Client attack on {self.server_ip}:{self.server_port} launches in {time_to_att} seconds")
                     time.sleep(time_to_att)
